@@ -39,6 +39,6 @@ const TodoListSchema = new mongoose.Schema(
 );
 
 // Models
-const User = mongoose.model("User", UserSchema);
-const Task = mongoose.model("Task", TaskSchema);
-const TodoList = mongoose.model("TodoList", TodoListSchema);
+export const User = mongoose.model("User", UserSchema);
+export const Task = mongoose.model("Task", TaskSchema);
+export const TodoList = mongoose.model("TodoList", TodoListSchema);
