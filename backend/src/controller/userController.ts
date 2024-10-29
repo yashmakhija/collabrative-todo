@@ -21,6 +21,9 @@ export async function userSignup(req: Request, res: Response) {
     });
     return;
   }
+  if (!jwt_key) {
+    throw new Error("JWT Secret key is not defined in environment variables");
+  }
   try {
     const existingUser = await User.findOne({ email: result.data.email });
     if (existingUser) {
@@ -46,6 +49,7 @@ export async function userSignup(req: Request, res: Response) {
       .status(201)
       .json({ msg: "User created successfully.", token: `Bearer ${token}` });
   } catch (error) {
+    console.error("Error message:", error);
     res.status(500).json({ msg: "Internal Server Error" });
     return;
   }
@@ -55,20 +59,23 @@ export async function userSignin(req: Request, res: Response) {
   const result = signInSchema.safeParse(req.body);
 
   if (!result.success) {
-    return res.status(400).json({
+    res.status(400).json({
       msg: `Input is wrong`,
       errors: result.error.format(),
     });
+    return;
   }
   try {
     const user = await User.findOne({ email: result.data.email });
     if (!user) {
-      return res.status(400).json({ msg: "Invalid email or password." });
+      res.status(400).json({ msg: "Invalid email or password." });
+      return;
     }
 
     const isValid = await bcrypt.compare(result.data.password, user.password);
     if (!isValid) {
-      return res.status(400).json({ msg: "Invalid email or password." });
+      res.status(400).json({ msg: "Invalid email or password." });
+      return;
     }
 
     const token = jwt.sign(
