@@ -1,44 +1,22 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-// User Schema
-const UserSchema = new mongoose.Schema(
-  {
-    userId: { type: String, unique: true, required: true },
-    name: String,
-    email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
-  },
-  { timestamps: true }
-);
+// Load environment variables from .env file
+dotenv.config();
 
-// Task Schema
-const TaskSchema = new mongoose.Schema(
-  {
-    title: { type: String, required: true },
-    completed: { type: Boolean, default: false },
-    assignee: String,
-    priority: {
-      type: String,
-      enum: ["low", "medium", "high"],
-      default: "medium",
-    },
-    dueDate: Date,
-  },
-  { timestamps: true }
-);
+// Get the MongoDB URI from environment variables
+const MONGODB_URI = process.env.DB_URI; // Make sure this variable is defined in your .env file
 
-// To-Do List Schema
-const TodoListSchema = new mongoose.Schema(
-  {
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    title: String,
-    tasks: [TaskSchema],
-    collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  },
-  { timestamps: true }
-);
+// Function to connect to MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGODB_URI as string);
+    console.log("MongoDB connected successfully.");
+  } catch (err) {
+    console.error("MongoDB connection failed:", err);
+    process.exit(1); // Exit the application if the connection fails
+  }
+};
 
-// Models
-export const User = mongoose.model("User", UserSchema);
-export const Task = mongoose.model("Task", TaskSchema);
-export const TodoList = mongoose.model("TodoList", TodoListSchema);
+// Export the connection function
+export default connectDB;
