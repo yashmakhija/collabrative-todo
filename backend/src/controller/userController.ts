@@ -12,7 +12,7 @@ const jwt_key = process.env.JWT_Secret as string;
 const SALT_ROUNDS = 10;
 
 //signup fucntion
-export async function userSignup(req: Request, res: Response) {
+export const userSignup = async (req: Request, res: Response) => {
   const result = userSchema.safeParse(req.body);
   if (!result.success) {
     res.status(400).json({
@@ -53,8 +53,9 @@ export async function userSignup(req: Request, res: Response) {
     res.status(500).json({ msg: "Internal Server Error" });
     return;
   }
-}
+};
 
+//signin function
 export async function userSignin(req: Request, res: Response) {
   const result = signInSchema.safeParse(req.body);
 
