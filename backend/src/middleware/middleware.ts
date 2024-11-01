@@ -1,10 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const jwt_key = process.env.JWT_Secret as string;
+
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: string | JwtPayload; // Type this based on your JWT payload structure
+  }
+}
 
 // Middleware to authenticate JWT
 export const authenticateJWT = (
@@ -14,19 +20,21 @@ export const authenticateJWT = (
 ) => {
   const authHeader = req.header("Authorization");
   if (!authHeader) {
-    res.sendStatus(401); // No token, unauthorized
+    res.status(401).json({ message: "Authorization header missing" }); // No token, unauthorized
     return;
   }
 
   const token = authHeader.split(" ")[1]; // Extract token from "Bearer <token>"
   if (!token) {
-    res.sendStatus(401);
+    res
+      .status(401)
+      .json({ message: "Token missing from Authorization header" });
     return;
   }
 
   jwt.verify(token, jwt_key, (err, user) => {
     if (err) {
-      res.sendStatus(403);
+      res.status(403).json({ message: "Invalid or expired token" });
       return;
     }
 
