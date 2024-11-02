@@ -11,6 +11,7 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 // Task Schema
 const TaskSchema = new mongoose.Schema({
+    userId: { type: String, unique: true, required: true },
     title: { type: String, required: true },
     completed: { type: Boolean, default: false },
     assignee: String,

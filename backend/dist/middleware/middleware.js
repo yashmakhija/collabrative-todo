@@ -24,12 +24,13 @@ const authenticateJWT = (req, res, next) => {
     }
     jsonwebtoken_1.default.verify(token, jwt_key, (err, user) => {
         if (err) {
-            res.status(403).json({ message: "Invalid or expired token" });
-            return;
+            if (err.name === "TokenExpiredError") {
+                return res.status(403).json({ message: "Token has expired" });
+            }
+            return res.status(403).json({ message: "Invalid or expired token" });
         }
-        // Attach user info to request object
-        req.user = user;
-        next(); // Proceed to the next middleware or route handler
+        req.user = user; // Ensure this contains the userId
+        next();
     });
 };
 exports.authenticateJWT = authenticateJWT;

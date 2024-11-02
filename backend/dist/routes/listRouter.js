@@ -9,4 +9,5 @@ const listController_1 = require("../controller/listController");
 dotenv_1.default.config();
 const listRouter = express_1.default.Router();
 listRouter.post("/create", listController_1.createList);
+listRouter.post("/:listId/task", listController_1.addTask);
 exports.default = listRouter;
