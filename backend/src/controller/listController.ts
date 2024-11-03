@@ -48,7 +48,6 @@ export const createList = async (req: Request, res: Response) => {
 };
 
 //create a task on list (like adding task in category)
-
 export const addTask = async (req: Request, res: Response) => {
   const listId = req.params.listId;
   const result = taskSchema.safeParse(req.body);
@@ -88,4 +87,44 @@ export const addTask = async (req: Request, res: Response) => {
     console.error("Error adding task:", error);
     res.status(500).json({ message: "Error adding task to to-do list", error });
   }
+};
+
+//delete a task on list (user who create the task on that list could be deleted )
+
+export const deleteTask = async (req: Request, res: Response) => {
+  const { listId, taskId } = req.params;
+  const userId = (req.user as { userId: string }).userId;
+
+  if (!listId && !taskId) {
+    res.status(404).json({
+      message: `Wrong inputs`,
+    });
+    return;
+  }
+
+  try {
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    //note:- Drawback (due to assigne can delete but its not good idealogy)
+    if (task.assignee !== userId) {
+      res
+        .status(403)
+        .json({ message: "You do not have permission to delete this task" });
+      return;
+    }
+
+    await Task.findByIdAndDelete(taskId);
+
+    await TodoList.findByIdAndUpdate(listId, { $pull: { tasks: taskId } });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).json({ message: "Error deleting task", error });
+    return;
+  }
+
+  const findTask = await Task.find;
 };
