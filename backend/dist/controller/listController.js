@@ -69,7 +69,8 @@ const addTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             priority: (_c = result.data) === null || _c === void 0 ? void 0 : _c.priority,
             dueDate: (_d = result.data) === null || _d === void 0 ? void 0 : _d.dueDate,
         });
-        const updatedList = yield models_1.TodoList.findByIdAndUpdate(listId, { $push: { tasks: newTask } }, { new: true, runValidators: true });
+        yield newTask.save();
+        const updatedList = yield models_1.TodoList.findByIdAndUpdate(listId, { $push: { tasks: newTask._id } }, { new: true, runValidators: true });
         if (!updatedList) {
             res.status(404).json({ message: "To-Do List not found" });
             return;

@@ -11,7 +11,6 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 // Task Schema
 const TaskSchema = new mongoose.Schema({
-    userId: { type: String, unique: true, required: true },
     title: { type: String, required: true },
     completed: { type: Boolean, default: false },
     assignee: String,
@@ -26,7 +25,7 @@ const TaskSchema = new mongoose.Schema({
 const TodoListSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     title: String,
-    tasks: [TaskSchema],
+    tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
     collaborators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 // Models

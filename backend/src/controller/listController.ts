@@ -18,6 +18,7 @@ export const createList = async (req: Request, res: Response) => {
       owner: userId,
       title: title,
     });
+
     if (existingList) {
       res.status(400).json({
         message: "A to-do list with this title already exists for this user.",
@@ -65,9 +66,11 @@ export const addTask = async (req: Request, res: Response) => {
       dueDate: result.data?.dueDate,
     });
 
+    await newTask.save();
+
     const updatedList = await TodoList.findByIdAndUpdate(
       listId,
-      { $push: { tasks: newTask } },
+      { $push: { tasks: newTask._id } },
       { new: true, runValidators: true }
     );
 
